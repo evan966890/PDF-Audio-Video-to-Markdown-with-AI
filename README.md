@@ -1,6 +1,8 @@
-# 📄🎵🎬 PDF-Audio-video2Markdown
+# 📄🎵🎬 PDF-Audio-Video-to-Markdown with AI
 
 > 🤖 **Universal AI Skill** for Claude Code / Cursor / Antigravity / Windsurf and more
+>
+> Let AI handle everything - from setup to transcription!
 
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Compatible-8A2BE2?logo=anthropic&logoColor=white)](https://claude.ai)
 [![Cursor](https://img.shields.io/badge/Cursor-Compatible-00DC82?logo=cursor&logoColor=white)](https://cursor.com)
@@ -9,8 +11,8 @@
 
 [![Python 3.10-3.12](https://img.shields.io/badge/Python-3.10--3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub stars](https://img.shields.io/github/stars/evan966890/PDF-Audio-video2Markdown?style=social)](https://github.com/evan966890/PDF-Audio-video2Markdown)
-[![GitHub forks](https://img.shields.io/github/forks/evan966890/PDF-Audio-video2Markdown?style=social)](https://github.com/evan966890/PDF-Audio-video2Markdown)
+[![GitHub stars](https://img.shields.io/github/stars/evan966890/PDF-Audio-Video-to-Markdown-with-AI?style=social)](https://github.com/evan966890/PDF-Audio-Video-to-Markdown-with-AI)
+[![GitHub forks](https://img.shields.io/github/forks/evan966890/PDF-Audio-Video-to-Markdown-with-AI?style=social)](https://github.com/evan966890/PDF-Audio-Video-to-Markdown-with-AI)
 
 ---
 
@@ -126,19 +128,19 @@ Intelligently convert PDF, Audio, Video & Images to Markdown text, especially op
 
 ```bash
 # Claude Code
-git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.claude/skills/PDF-Audio-video2Markdown
+git clone https://github.com/evan966890/PDF-Audio-Video-to-Markdown-with-AI.git ~/.claude/skills/PDF-Audio-Video-to-Markdown-with-AI
 
 # Cursor
-git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.cursor/skills/PDF-Audio-video2Markdown
+git clone https://github.com/evan966890/PDF-Audio-Video-to-Markdown-with-AI.git ~/.cursor/skills/PDF-Audio-Video-to-Markdown-with-AI
 
 # Antigravity
-git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.antigravity/skills/PDF-Audio-video2Markdown
+git clone https://github.com/evan966890/PDF-Audio-Video-to-Markdown-with-AI.git ~/.antigravity/skills/PDF-Audio-Video-to-Markdown-with-AI
 
 # Windsurf
-git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.windsurf/skills/PDF-Audio-video2Markdown
+git clone https://github.com/evan966890/PDF-Audio-Video-to-Markdown-with-AI.git ~/.windsurf/skills/PDF-Audio-Video-to-Markdown-with-AI
 
 # Or project-level (any IDE) | 或项目级别（任意 IDE）
-git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git your-project/.claude/skills/PDF-Audio-video2Markdown
+git clone https://github.com/evan966890/PDF-Audio-Video-to-Markdown-with-AI.git your-project/.claude/skills/PDF-Audio-Video-to-Markdown-with-AI
 ```
 
 **Step 2: Ask AI to Setup | 让 AI 帮你配置**
@@ -147,9 +149,9 @@ Simply tell your AI assistant in natural language (no manual commands needed!):
 
 只需用自然语言告诉你的 AI 助手（无需手动输入命令！）：
 
-> 🗣️ **English**: "Please install all dependencies for the PDF-Audio-video2Markdown skill"
+> 🗣️ **English**: "Please install all dependencies for the PDF-Audio-Video-to-Markdown-with-AI skill"
 > 
-> 🗣️ **中文**: "请帮我安装 PDF-Audio-video2Markdown 这个技能的所有依赖"
+> 🗣️ **中文**: "请帮我安装 PDF-Audio-Video-to-Markdown-with-AI 这个技能的所有依赖"
 
 The AI will automatically run `setup_environment.py` and configure everything for you!
 
@@ -339,7 +341,7 @@ More FAQ: See `references/troubleshooting.md`
 - [ ] Web UI interface
 - [ ] Docker container
 
-**Have ideas?** [Open an issue](https://github.com/evan966890/PDF-Audio-video2Markdown/issues)!
+**Have ideas?** [Open an issue](https://github.com/evan966890/PDF-Audio-Video-to-Markdown-with-AI/issues)!
 
 ---
 

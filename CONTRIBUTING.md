@@ -28,7 +28,7 @@ This project follows a simple code of conduct:
 
 ### 🐛 Reporting Bugs
 
-1. Check [existing issues](https://github.com/evan966890/PDF-Audio-video2Markdown/issues) first
+1. Check [existing issues](https://github.com/evan966890/PDF-Audio-Video-to-Markdown-with-AI/issues) first
 2. Create a new issue with:
    - Clear title
    - Steps to reproduce

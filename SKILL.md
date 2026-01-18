@@ -1,5 +1,5 @@
 ---
-name: pdf-audio-video-to-markdown
+name: pdf-audio-video-to-markdown-with-ai
 description: >
   Universal AI Skill to convert PDF, audio, video, and images to Markdown text.
   Use this skill when: transcribing meeting recordings, extracting PDF text,
@@ -8,11 +8,12 @@ description: >
   触发关键词: 转录, 会议录屏, PDF转文字, 音频转文字, 视频转文字, OCR, 文档处理,
   transcribe, meeting recording, PDF to text, audio to text, video to text, document processing.
   Works with Claude Code, Cursor, Antigravity, Windsurf, and any IDE supporting skill format.
+  Let AI handle everything - from environment setup to file transcription!
 ---
 
-# PDF-Audio-video2Markdown
+# PDF-Audio-Video-to-Markdown with AI
 
-🤖 **Universal AI Skill** | 通用 AI 技能
+🤖 **Universal AI Skill** | 通用 AI 技能 | Let AI do the work!
 
 Convert PDF / Audio / Video / Images to Markdown text intelligently.
 
@@ -37,10 +38,10 @@ PDF-Audio-video2Markdown is a **fully portable** multimodal document processing 
 
 ```bash
 # Claude Code
-git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.claude/skills/PDF-Audio-video2Markdown
+git clone https://github.com/evan966890/PDF-Audio-Video-to-Markdown-with-AI.git ~/.claude/skills/PDF-Audio-Video-to-Markdown-with-AI
 
 # Cursor
-git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.cursor/skills/PDF-Audio-video2Markdown
+git clone https://github.com/evan966890/PDF-Audio-Video-to-Markdown-with-AI.git ~/.cursor/skills/PDF-Audio-Video-to-Markdown-with-AI
 ```
 
 ### Step 2: Ask AI to Setup | 让 AI 帮你配置
@@ -49,9 +50,9 @@ Just tell your AI assistant in natural language (no manual commands!):
 
 只需用自然语言告诉 AI（无需手动命令！）：
 
-> 🗣️ "Please install all dependencies for the PDF-Audio-video2Markdown skill"
+> 🗣️ "Please install all dependencies for the PDF-Audio-Video-to-Markdown-with-AI skill"
 >
-> 🗣️ "请帮我安装 PDF-Audio-video2Markdown 这个技能的所有依赖"
+> 🗣️ "请帮我安装 PDF-Audio-Video-to-Markdown-with-AI 这个技能的所有依赖"
 
 ### Step 3: Use It | 开始使用
 
