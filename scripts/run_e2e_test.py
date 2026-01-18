@@ -1,253 +1,182 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-DocPipe 端到端测试脚本
+PDF-Audio-Video-to-Markdown-with-AI End-to-End Test Script
+端到端测试脚本
 
-功能：
-1. 自动配置环境
-2. 交互式询问测试文件路径
-3. 运行 PDF 和音视频测试
-4. 循环重试直到成功
+Features / 功能:
+1. Auto-configure environment / 自动配置环境
+2. Interactive test directory selection / 交互式选择测试目录
+3. Retry until success (max 10 times) / 重试直到成功（最多10次）
 
-用法：
+Usage / 用法:
     python run_e2e_test.py
 """
 
 import sys
-import subprocess
 import time
 from pathlib import Path
-from datetime import datetime
 
-# 配置
-MAX_TOTAL_RETRIES = 10  # 每种类型最大重试次数
-DEFAULT_INPUT_DIR = "./input"
-DEFAULT_OUTPUT_DIR = "./output"
+# Get script directory / 获取脚本目录
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_DIR = SCRIPT_DIR.parent
 
-
-def print_header(title: str):
-    """打印标题"""
-    print(f"\n{'='*60}")
-    print(f" {title}")
-    print(f"{'='*60}")
+# Add to path / 添加到路径
+sys.path.insert(0, str(SCRIPT_DIR))
 
 
-def run_setup() -> bool:
-    """运行环境配置"""
-    print_header("步骤 1: 环境配置")
+def check_environment():
+    """Check if environment is ready / 检查环境是否就绪"""
+    print("\n[1/4] Checking environment / 检查环境...")
     
-    script_dir = Path(__file__).parent
-    setup_script = script_dir / "setup_environment.py"
+    # Check Python version / 检查Python版本
+    version = sys.version_info
+    if not (3 <= version.major and 10 <= version.minor <= 12):
+        print(f"  [X] Python {version.major}.{version.minor} not supported")
+        print(f"      Need Python 3.10-3.12")
+        return False
+    print(f"  [OK] Python {version.major}.{version.minor}.{version.micro}")
     
-    if not setup_script.exists():
-        print(f"[ERROR] 找不到环境配置脚本: {setup_script}")
+    # Check core dependencies / 检查核心依赖
+    deps = [
+        ("fitz", "PyMuPDF"),
+        ("pydub", "pydub"),
+        ("funasr", "FunASR"),
+    ]
+    
+    for import_name, display_name in deps:
+        try:
+            __import__(import_name)
+            print(f"  [OK] {display_name}")
+        except ImportError:
+            print(f"  [X] {display_name} not installed")
+            return False
+    
+    return True
+
+
+def setup_environment():
+    """Run environment setup / 运行环境配置"""
+    print("\n[2/4] Setting up environment / 配置环境...")
+    
+    setup_script = SCRIPT_DIR / "setup_environment.py"
+    if setup_script.exists():
+        import subprocess
+        result = subprocess.run([sys.executable, str(setup_script)], 
+                              capture_output=False)
+        return result.returncode == 0
+    else:
+        print("  [WARN] setup_environment.py not found")
+        return True
+
+
+def find_test_files(test_dir: Path) -> list:
+    """Find test files / 查找测试文件"""
+    from process_file import FILE_TYPE_MAP
+    
+    files = []
+    for ext in FILE_TYPE_MAP.keys():
+        files.extend(test_dir.glob(f"*{ext}"))
+        files.extend(test_dir.glob(f"*{ext.upper()}"))
+    return sorted(set(files))
+
+
+def run_test(test_dir: Path, output_dir: Path) -> bool:
+    """Run test on directory / 在目录上运行测试"""
+    from process_file import process_with_retry
+    
+    files = find_test_files(test_dir)
+    
+    if not files:
+        print(f"  [X] No test files found in {test_dir}")
         return False
     
-    result = subprocess.run(
-        [sys.executable, str(setup_script)],
-        capture_output=False
-    )
+    print(f"  Found {len(files)} test file(s)")
     
-    return result.returncode == 0
-
-
-def get_test_directory() -> Path:
-    """交互式获取测试目录"""
-    print_header("步骤 2: 选择测试目录")
-    
-    print(f"请输入测试文件目录路径")
-    print(f"（留空则使用默认目录 {DEFAULT_INPUT_DIR}）")
-    print(f"支持的格式: PDF, PNG, JPG, MP3, WAV, M4A, MP4, AVI, MKV")
-    
-    user_input = input("\n>>> ").strip()
-    
-    if not user_input:
-        test_dir = Path(DEFAULT_INPUT_DIR)
-    else:
-        test_dir = Path(user_input)
-    
-    # 转换为绝对路径
-    if not test_dir.is_absolute():
-        test_dir = Path(__file__).parent.parent / test_dir
-    
-    test_dir = test_dir.resolve()
-    
-    if not test_dir.exists():
-        print(f"\n[INFO] 目录不存在，已创建: {test_dir}")
-        test_dir.mkdir(parents=True, exist_ok=True)
-    
-    print(f"测试目录: {test_dir}")
-    return test_dir
-
-
-def find_test_files(test_dir: Path) -> dict:
-    """查找测试文件"""
-    # PDF 文件
-    pdf_files = list(test_dir.glob("*.pdf")) + list(test_dir.glob("*.PDF"))
-    
-    # 音视频文件
-    audio_video_files = []
-    for ext in [".mp3", ".wav", ".m4a", ".flac", ".mp4", ".avi", ".mkv", ".mov"]:
-        audio_video_files.extend(test_dir.glob(f"*{ext}"))
-        audio_video_files.extend(test_dir.glob(f"*{ext.upper()}"))
-    
-    # 图像文件
-    image_files = []
-    for ext in [".png", ".jpg", ".jpeg", ".tiff"]:
-        image_files.extend(test_dir.glob(f"*{ext}"))
-        image_files.extend(test_dir.glob(f"*{ext.upper()}"))
-    
-    # 选择最小的文件进行测试（加快测试速度）
-    def get_smallest(files):
-        if not files:
-            return None
-        return min(files, key=lambda f: f.stat().st_size)
-    
-    return {
-        "pdf": get_smallest(pdf_files),
-        "audio_video": get_smallest(audio_video_files),
-        "image": get_smallest(image_files),
-    }
-
-
-def run_process(file_path: Path, output_dir: Path) -> bool:
-    """运行处理脚本"""
-    script_dir = Path(__file__).parent
-    process_script = script_dir / "process_file.py"
-    
-    result = subprocess.run(
-        [sys.executable, str(process_script), str(file_path), str(output_dir)],
-        capture_output=False
-    )
-    
-    return result.returncode == 0
-
-
-def test_file_type(name: str, file_path: Path, output_dir: Path, max_retries: int) -> bool:
-    """测试单个文件类型"""
-    if file_path is None:
-        print(f"\n[SKIP] 未找到 {name} 测试文件")
-        return True  # 没有文件视为成功
-    
-    print(f"\n测试文件: {file_path.name}")
-    print(f"大小: {file_path.stat().st_size / 1024:.1f} KB")
-    
-    for attempt in range(max_retries):
-        print(f"\n>>> {name} 测试 (尝试 {attempt + 1}/{max_retries})")
+    success_count = 0
+    for file in files:
+        print(f"\n  Testing: {file.name}")
+        result = process_with_retry(file, output_dir, max_retries=3)
         
-        if run_process(file_path, output_dir):
-            print(f"\n[SUCCESS] {name} 处理成功！")
-            return True
+        if result.success:
+            success_count += 1
+            print(f"    [OK] {result.strategy}, {result.text_length} chars")
         else:
-            if attempt < max_retries - 1:
-                print(f"[RETRY] {name} 处理失败，等待 2 秒后重试...")
-                time.sleep(2)
+            print(f"    [X] {result.error}")
     
-    print(f"\n[FAILED] {name} 测试失败，已达到最大重试次数")
-    return False
-
-
-def run_e2e_test():
-    """运行端到端测试"""
-    print("\n" + "="*60)
-    print("         DocPipe 端到端测试")
-    print("="*60)
-    print(f"时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Python: {sys.version.split()[0]}")
-    
-    # 1. 环境配置
-    if not run_setup():
-        print("\n[ERROR] 环境配置失败，请查看上方错误信息")
-        return False
-    
-    # 2. 获取测试目录
-    test_dir = get_test_directory()
-    
-    # 3. 查找测试文件
-    print_header("步骤 3: 查找测试文件")
-    test_files = find_test_files(test_dir)
-    
-    has_files = any(f is not None for f in test_files.values())
-    
-    if not has_files:
-        print(f"\n[INFO] 在 {test_dir} 中未找到测试文件")
-        print("\n支持的格式:")
-        print("  - PDF: *.pdf")
-        print("  - 音频: *.mp3, *.wav, *.m4a, *.flac")
-        print("  - 视频: *.mp4, *.avi, *.mkv, *.mov")
-        print("  - 图像: *.png, *.jpg, *.jpeg")
-        print("\n请将测试文件放入该目录后重新运行")
-        return False
-    
-    print("找到的测试文件:")
-    for name, path in test_files.items():
-        if path:
-            print(f"  {name}: {path.name} ({path.stat().st_size / 1024:.1f} KB)")
-        else:
-            print(f"  {name}: (无)")
-    
-    # 4. 创建输出目录
-    output_dir = Path(__file__).parent.parent / DEFAULT_OUTPUT_DIR
-    output_dir = output_dir.resolve()
-    output_dir.mkdir(parents=True, exist_ok=True)
-    print(f"\n输出目录: {output_dir}")
-    
-    # 5. 运行测试
-    results = {}
-    
-    # PDF 测试
-    print_header("步骤 4: PDF 处理测试")
-    results["pdf"] = test_file_type("PDF", test_files["pdf"], output_dir, MAX_TOTAL_RETRIES)
-    
-    # 音视频测试
-    print_header("步骤 5: 音视频处理测试")
-    results["audio_video"] = test_file_type("音视频", test_files["audio_video"], output_dir, MAX_TOTAL_RETRIES)
-    
-    # 图像测试（可选）
-    if test_files["image"]:
-        print_header("步骤 6: 图像处理测试")
-        results["image"] = test_file_type("图像", test_files["image"], output_dir, MAX_TOTAL_RETRIES)
-    
-    # 6. 总结
-    print_header("测试结果")
-    
-    all_success = True
-    for name, success in results.items():
-        status = "[PASS]" if success else "[FAIL]"
-        print(f"  {name}: {status}")
-        if not success:
-            all_success = False
-    
-    print(f"\n输出目录: {output_dir}")
-    
-    if all_success:
-        print("\n" + "="*60)
-        print("  [SUCCESS] 端到端测试全部通过！")
-        print("  DocPipe 已准备就绪，可以开始处理文件")
-        print("="*60)
-    else:
-        print("\n" + "="*60)
-        print("  [FAILED] 部分测试未通过")
-        print("  请查看上方错误信息进行排查")
-        print("="*60)
-    
-    return all_success
+    return success_count > 0
 
 
 def main():
-    """主函数"""
-    try:
-        success = run_e2e_test()
-        sys.exit(0 if success else 1)
-    except KeyboardInterrupt:
-        print("\n\n[ABORT] 用户取消测试")
-        sys.exit(130)
-    except Exception as e:
-        print(f"\n[ERROR] 测试异常: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+    """Main function / 主函数"""
+    print("="*60)
+    print("PDF-Audio-Video-to-Markdown-with-AI E2E Test")
+    print("="*60)
+    
+    # Step 1: Check environment / 步骤1: 检查环境
+    if not check_environment():
+        print("\n[INFO] Running environment setup...")
+        if not setup_environment():
+            print("[ERROR] Environment setup failed")
+            return 1
+        
+        # Re-check
+        if not check_environment():
+            print("[ERROR] Environment still not ready")
+            return 1
+    
+    # Step 2: Get test directory / 步骤2: 获取测试目录
+    print("\n[3/4] Test directory setup / 测试目录设置...")
+    
+    default_input = PROJECT_DIR / "input"
+    default_output = PROJECT_DIR / "output"
+    
+    print(f"  Default input: {default_input}")
+    print(f"  Default output: {default_output}")
+    
+    user_input = input("\n  Enter test directory (or press Enter for default): ").strip()
+    
+    if user_input:
+        test_dir = Path(user_input).resolve()
+    else:
+        test_dir = default_input
+    
+    output_dir = default_output
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    if not test_dir.exists():
+        print(f"\n  [X] Directory not found: {test_dir}")
+        print(f"  Please place test files in: {default_input}")
+        default_input.mkdir(parents=True, exist_ok=True)
+        return 1
+    
+    # Step 3: Run test with retry / 步骤3: 运行测试（带重试）
+    print(f"\n[4/4] Running E2E test / 运行端到端测试...")
+    print(f"  Input: {test_dir}")
+    print(f"  Output: {output_dir}")
+    
+    max_attempts = 10
+    for attempt in range(max_attempts):
+        print(f"\n--- Attempt {attempt + 1}/{max_attempts} ---")
+        
+        try:
+            if run_test(test_dir, output_dir):
+                print("\n" + "="*60)
+                print("[SUCCESS] E2E test passed!")
+                print("="*60)
+                return 0
+        except Exception as e:
+            print(f"  [ERROR] {e}")
+        
+        if attempt < max_attempts - 1:
+            print(f"\n  Retrying in 3 seconds...")
+            time.sleep(3)
+    
+    print("\n" + "="*60)
+    print("[FAILED] E2E test failed after all attempts")
+    print("="*60)
+    return 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -1,245 +1,180 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-DocPipe 环境自动配置脚本
+PDF-Audio-Video-to-Markdown-with-AI Environment Setup Script
+环境配置脚本
 
-功能：
-1. 检测 Python 版本（需 3.10-3.12）
-2. 检测并安装依赖
-3. 验证各引擎可用性
-4. 自动重试失败的安装
+Features / 功能:
+1. Check Python version / 检查Python版本
+2. Auto-install dependencies / 自动安装依赖
+3. Verify installation / 验证安装
+4. Check FFmpeg / 检查FFmpeg
 
-用法：
+Usage / 用法:
     python setup_environment.py
 """
 
 import sys
 import subprocess
-import importlib
-from pathlib import Path
-
-# Python 版本要求
-REQUIRED_PYTHON_MIN = (3, 10)
-REQUIRED_PYTHON_MAX = (3, 12)
-
-# 依赖分组
-DEPENDENCIES = {
-    "core": [
-        "pymupdf",      # PDF 处理
-        "pydantic",     # 数据模型
-        "pyyaml",       # 配置文件
-    ],
-    "ocr": [
-        "rapidocr-onnxruntime",  # OCR 引擎
-        "opencv-python-headless",
-        "numpy",
-    ],
-    "asr": [
-        "funasr",       # ASR 引擎
-        "modelscope",   # 模型管理
-        "pydub",        # 音频处理
-    ],
-    "utils": [
-        "psutil",       # 系统资源检测
-    ]
-}
-
-# 引擎模块映射
-ENGINE_MODULES = {
-    "PyMuPDF": "fitz",
-    "RapidOCR": "rapidocr_onnxruntime",
-    "FunASR": "funasr",
-    "pydub": "pydub",
-    "psutil": "psutil",
-}
+import shutil
 
 
-def print_header(title: str):
-    """打印标题"""
-    print(f"\n{'='*60}")
-    print(f" {title}")
-    print(f"{'='*60}")
-
-
-def check_python_version() -> bool:
-    """检查 Python 版本"""
-    print_header("检查 Python 版本")
+def check_python_version():
+    """Check Python version / 检查Python版本"""
+    print("\n[1/4] Checking Python version / 检查Python版本...")
     
-    version = sys.version_info[:2]
-    version_str = f"{version[0]}.{version[1]}"
+    version = sys.version_info
+    print(f"  Current: Python {version.major}.{version.minor}.{version.micro}")
     
-    if version < REQUIRED_PYTHON_MIN:
-        print(f"[FAIL] Python {version_str} 版本过低")
-        print(f"       需要 Python 3.10 - 3.12")
+    if version.major != 3 or not (10 <= version.minor <= 12):
+        print(f"  [X] Python 3.10-3.12 required")
+        print(f"      Please install a compatible Python version")
         return False
     
-    if version > REQUIRED_PYTHON_MAX:
-        print(f"[FAIL] Python {version_str} 版本过高")
-        print(f"       需要 Python 3.10 - 3.12")
-        print(f"       建议安装 Python 3.12")
-        return False
-    
-    print(f"[OK] Python {version_str}")
+    print(f"  [OK] Python version compatible")
     return True
 
 
-def install_package(package: str, max_retries: int = 3) -> bool:
-    """安装单个包，支持重试"""
-    for attempt in range(max_retries):
+def install_dependencies():
+    """Install Python dependencies / 安装Python依赖"""
+    print("\n[2/4] Installing dependencies / 安装依赖...")
+    
+    packages = [
+        "pymupdf",
+        "pydub",
+        "funasr",
+        "modelscope",
+        "psutil",
+    ]
+    
+    optional_packages = [
+        ("rapidocr-onnxruntime", "OCR support"),
+        ("opencv-python-headless", "Image processing"),
+    ]
+    
+    # Install core packages / 安装核心包
+    for pkg in packages:
+        print(f"  Installing {pkg}...", end="", flush=True)
         try:
-            print(f"  安装 {package}... (尝试 {attempt + 1}/{max_retries})", end="", flush=True)
             result = subprocess.run(
-                [sys.executable, "-m", "pip", "install", package, "-q", "--disable-pip-version-check"],
+                [sys.executable, "-m", "pip", "install", pkg, "-q"],
                 capture_output=True,
-                text=True,
-                timeout=300  # 5分钟超时
+                timeout=300
             )
             if result.returncode == 0:
                 print(" [OK]")
-                return True
             else:
-                print(" [RETRY]")
-                if attempt == max_retries - 1:
-                    print(f"    错误: {result.stderr[:200] if result.stderr else 'Unknown error'}")
-        except subprocess.TimeoutExpired:
-            print(" [TIMEOUT]")
+                print(f" [X] {result.stderr.decode()[:100]}")
         except Exception as e:
-            print(f" [ERROR] {e}")
+            print(f" [X] {e}")
     
-    print(f"  [FAIL] {package} 安装失败")
-    return False
-
-
-def install_dependencies() -> dict:
-    """安装所有依赖"""
-    print_header("安装依赖")
-    
-    results = {"success": [], "failed": []}
-    
-    for group, packages in DEPENDENCIES.items():
-        print(f"\n[{group.upper()}] 安装依赖组...")
-        for pkg in packages:
-            if install_package(pkg):
-                results["success"].append(pkg)
-            else:
-                results["failed"].append(pkg)
-    
-    return results
-
-
-def verify_engines() -> dict:
-    """验证各引擎是否可用"""
-    print_header("验证引擎")
-    
-    status = {}
-    
-    for name, module in ENGINE_MODULES.items():
+    # Install optional packages / 安装可选包
+    print("\n  Installing optional packages / 安装可选包...")
+    for pkg, desc in optional_packages:
+        print(f"  Installing {pkg} ({desc})...", end="", flush=True)
         try:
-            importlib.import_module(module)
-            print(f"  [OK] {name}")
-            status[name] = True
-        except ImportError as e:
-            print(f"  [FAIL] {name}: {e}")
-            status[name] = False
+            result = subprocess.run(
+                [sys.executable, "-m", "pip", "install", pkg, "-q"],
+                capture_output=True,
+                timeout=300
+            )
+            if result.returncode == 0:
+                print(" [OK]")
+            else:
+                print(f" [SKIP]")
         except Exception as e:
-            print(f"  [WARN] {name}: {e}")
-            status[name] = False
+            print(f" [SKIP]")
     
-    return status
+    return True
 
 
-def check_ffmpeg() -> bool:
-    """检查 FFmpeg 是否可用"""
-    print_header("检查 FFmpeg")
+def verify_installation():
+    """Verify installation / 验证安装"""
+    print("\n[3/4] Verifying installation / 验证安装...")
     
-    try:
-        result = subprocess.run(
-            ["ffmpeg", "-version"],
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
-        if result.returncode == 0:
-            version_line = result.stdout.split('\n')[0]
-            print(f"  [OK] {version_line[:60]}")
-            return True
-    except FileNotFoundError:
-        print("  [WARN] FFmpeg 未安装")
-        print("         音视频处理可能受限")
-        print("         下载地址: https://ffmpeg.org/download.html")
-    except Exception as e:
-        print(f"  [WARN] FFmpeg 检查失败: {e}")
+    core_deps = [
+        ("fitz", "PyMuPDF"),
+        ("pydub", "pydub"),
+        ("funasr", "FunASR"),
+        ("modelscope", "ModelScope"),
+        ("psutil", "psutil"),
+    ]
     
-    return False
+    optional_deps = [
+        ("rapidocr_onnxruntime", "RapidOCR"),
+        ("cv2", "OpenCV"),
+    ]
+    
+    all_ok = True
+    
+    for import_name, display_name in core_deps:
+        try:
+            __import__(import_name)
+            print(f"  [OK] {display_name}")
+        except ImportError:
+            print(f"  [X] {display_name} - REQUIRED")
+            all_ok = False
+    
+    for import_name, display_name in optional_deps:
+        try:
+            __import__(import_name)
+            print(f"  [OK] {display_name} (optional)")
+        except ImportError:
+            print(f"  [--] {display_name} (optional, not installed)")
+    
+    return all_ok
 
 
-def print_summary(install_results: dict, engine_status: dict, ffmpeg_ok: bool):
-    """打印配置摘要"""
-    print_header("配置结果")
+def check_ffmpeg():
+    """Check FFmpeg installation / 检查FFmpeg安装"""
+    print("\n[4/4] Checking FFmpeg / 检查FFmpeg...")
     
-    print(f"\n依赖安装:")
-    print(f"  成功: {len(install_results['success'])} 个")
-    print(f"  失败: {len(install_results['failed'])} 个")
+    ffmpeg_path = shutil.which("ffmpeg")
     
-    if install_results['failed']:
-        print(f"  失败列表: {', '.join(install_results['failed'])}")
-    
-    print(f"\n引擎状态:")
-    for name, ok in engine_status.items():
-        print(f"  {name}: {'[OK]' if ok else '[FAIL]'}")
-    
-    print(f"\nFFmpeg: {'[OK]' if ffmpeg_ok else '[WARN] 未安装'}")
-    
-    # 判断整体状态
-    critical_engines = ["PyMuPDF", "RapidOCR", "FunASR"]
-    all_critical_ok = all(engine_status.get(e, False) for e in critical_engines)
-    
-    print(f"\n{'='*60}")
-    if all_critical_ok and len(install_results['failed']) == 0:
-        print(" [SUCCESS] 环境配置完成，可以开始处理文件！")
-        return True
-    elif all_critical_ok:
-        print(" [WARNING] 环境基本可用，部分依赖安装失败")
+    if ffmpeg_path:
+        print(f"  [OK] FFmpeg found: {ffmpeg_path}")
         return True
     else:
-        print(" [FAILED] 关键引擎未就绪，请检查错误信息")
-        return False
+        print("  [WARN] FFmpeg not found")
+        print("  Audio/video processing may have issues")
+        print("\n  Install FFmpeg:")
+        print("    Windows: winget install FFmpeg")
+        print("    macOS: brew install ffmpeg")
+        print("    Linux: sudo apt install ffmpeg")
+        return True  # Not blocking, just warning
 
 
 def main():
-    """主函数"""
-    print("\n" + "="*60)
-    print("        DocPipe 环境自动配置")
+    """Main function / 主函数"""
     print("="*60)
-    print(f"Python: {sys.version}")
-    print(f"路径: {sys.executable}")
+    print("PDF-Audio-Video-to-Markdown-with-AI Environment Setup")
+    print("="*60)
     
-    # 1. 检查 Python 版本
+    # Step 1: Check Python
     if not check_python_version():
-        print("\n[ABORT] Python 版本不兼容，请安装 Python 3.10-3.12")
-        return {"success": False, "reason": "Python version incompatible"}
+        return 1
     
-    # 2. 安装依赖
-    install_results = install_dependencies()
+    # Step 2: Install dependencies
+    install_dependencies()
     
-    # 3. 验证引擎
-    engine_status = verify_engines()
+    # Step 3: Verify
+    if not verify_installation():
+        print("\n[ERROR] Some required dependencies failed to install")
+        print("  Try running: pip install pymupdf pydub funasr modelscope psutil")
+        return 1
     
-    # 4. 检查 FFmpeg
-    ffmpeg_ok = check_ffmpeg()
+    # Step 4: Check FFmpeg
+    check_ffmpeg()
     
-    # 5. 打印摘要
-    success = print_summary(install_results, engine_status, ffmpeg_ok)
+    print("\n" + "="*60)
+    print("[SUCCESS] Environment setup complete!")
+    print("="*60)
+    print("\nYou can now use the skill:")
+    print("  python scripts/process_file.py <file_path>")
+    print("  python scripts/process_all.py <input_dir>")
     
-    return {
-        "success": success,
-        "installed": install_results['success'],
-        "failed": install_results['failed'],
-        "engines": engine_status,
-        "ffmpeg": ffmpeg_ok
-    }
+    return 0
 
 
 if __name__ == "__main__":
-    result = main()
-    sys.exit(0 if result.get("success") else 1)
+    sys.exit(main())
