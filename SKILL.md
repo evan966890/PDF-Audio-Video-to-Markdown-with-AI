@@ -77,9 +77,29 @@ Tell AI what to process:
 - ✅ **Smart OCR**: Auto-detect text vs scanned PDF
 - ✅ **Chunked Processing**: Large files split into 30s segments
 - ✅ **Auto Retry**: 3 retries per file, 10 for E2E tests
-- ✅ **Offline Processing**: All local, privacy protected
+- ✅ **100% Local**: All processing on your machine, data never uploaded
 - ✅ **Zero Config**: Auto-install dependencies
 - ✅ **Portable**: No absolute paths, copy anywhere
+
+## 🔒 Privacy | 隐私保障
+
+**100% Local Processing** - Your data never leaves your machine!
+
+**100% 本地处理** - 您的数据永远不会离开您的电脑！
+
+- No cloud upload 无云端上传
+- No internet required after setup 配置后无需联网
+- No data collection 无数据收集
+- Open source & auditable 开源可审计
+
+## 💻 Requirements | 系统要求
+
+| Component | Minimum |
+|-----------|---------|
+| Python | 3.10-3.12 |
+| RAM | 8 GB |
+| Storage | 5 GB free |
+| OS | Windows 10+ / macOS 10.15+ / Linux |
 
 ## Reference Docs | 参考文档
 

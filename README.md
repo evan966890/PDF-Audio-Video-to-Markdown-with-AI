@@ -26,6 +26,8 @@ Intelligently convert PDF, Audio, Video & Images to Markdown text, especially op
 
 - [Why This Tool](#-why-this-tool)
 - [Features](#-features)
+- [Privacy & Security](#-privacy--security)
+- [System Requirements](#-system-requirements)
 - [Quick Start](#-quick-start)
 - [IDE Integration](#-ide-integration)
 - [Usage](#-usage)
@@ -62,6 +64,57 @@ Intelligently convert PDF, Audio, Video & Images to Markdown text, especially op
 | 🔒 **Fully Offline** | 完全离线 | All processing done locally, privacy protected |
 | ⚡ **Zero Config** | 零配置 | Auto-install dependencies, works out of the box |
 | 🌍 **Portable** | 可移植 | Copy to any machine, no absolute paths |
+
+---
+
+## 🔒 Privacy & Security | 隐私与安全
+
+> **🛡️ 100% Local Processing - Your Data Never Leaves Your Machine**
+>
+> **🛡️ 100% 本地处理 - 您的数据永远不会离开您的电脑**
+
+| Guarantee 保障 | Description 说明 |
+|---------------|-----------------|
+| ✅ **No Cloud Upload** | All transcription and OCR runs entirely on your local machine 所有转写和OCR完全在本地电脑运行 |
+| ✅ **No Internet Required** | Works completely offline after initial setup 初次配置后完全离线工作 |
+| ✅ **No Data Collection** | Zero telemetry, no usage tracking 无遥测，无使用追踪 |
+| ✅ **Your Files Stay Local** | Input files are never sent anywhere 输入文件不会被发送到任何地方 |
+| ✅ **Open Source** | Full code transparency, audit anytime 完全开源透明，随时可审计 |
+
+**Perfect for 适用于：**
+- 🏢 Corporate confidential meetings 企业机密会议
+- 🏥 Healthcare/Medical records 医疗健康记录
+- ⚖️ Legal documents 法律文件
+- 🔐 Any sensitive content 任何敏感内容
+
+---
+
+## 💻 System Requirements | 系统要求
+
+### Minimum Requirements | 最低配置
+
+| Component 组件 | Minimum 最低要求 | Recommended 推荐配置 |
+|---------------|-----------------|---------------------|
+| **OS 操作系统** | Windows 10 / macOS 10.15 / Ubuntu 18.04 | Windows 11 / macOS 12+ / Ubuntu 22.04 |
+| **Python** | 3.10 (required) | 3.11 or 3.12 |
+| **RAM 内存** | 8 GB | 16 GB+ |
+| **Storage 存储** | 5 GB free (for models) | 10 GB+ SSD |
+| **CPU 处理器** | 4 cores | 8+ cores |
+| **GPU 显卡** | Not required 非必需 | NVIDIA GPU (optional, for faster ASR) |
+
+### Notes | 注意事项
+
+- **First-time setup**: Will download ~2GB of AI models (FunASR, RapidOCR)
+  
+  **首次配置**：将下载约 2GB 的 AI 模型（FunASR、RapidOCR）
+
+- **Large files**: For videos >1 hour, recommend 16GB+ RAM
+  
+  **大文件处理**：处理超过1小时的视频，建议 16GB+ 内存
+
+- **FFmpeg**: Required for audio/video processing (auto-detected, manual install if missing)
+  
+  **FFmpeg**：音视频处理必需（自动检测，如缺失需手动安装）
 
 ---
 
