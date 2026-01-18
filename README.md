@@ -67,63 +67,74 @@ Intelligently convert PDF, Audio, Video & Images to Markdown text, especially op
 
 ## 🚀 Quick Start
 
-### 3 Steps to Get Started
+### 3 Steps to Get Started | 三步开始
+
+**Step 1: Clone to IDE Skills Folder | 克隆到 IDE 技能目录**
 
 ```bash
-# 1. Clone 克隆
-git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git
-cd PDF-Audio-video2Markdown
+# Claude Code
+git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.claude/skills/PDF-Audio-video2Markdown
 
-# 2. Setup 配置环境
-python scripts/setup_environment.py
+# Cursor
+git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.cursor/skills/PDF-Audio-video2Markdown
 
-# 3. Test 测试
-python scripts/run_e2e_test.py
+# Antigravity
+git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.antigravity/skills/PDF-Audio-video2Markdown
+
+# Windsurf
+git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.windsurf/skills/PDF-Audio-video2Markdown
+
+# Or project-level (any IDE) | 或项目级别（任意 IDE）
+git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git your-project/.claude/skills/PDF-Audio-video2Markdown
 ```
 
-That's it! 就这么简单！
+**Step 2: Ask AI to Setup | 让 AI 帮你配置**
+
+Simply tell your AI assistant in natural language (no manual commands needed!):
+
+只需用自然语言告诉你的 AI 助手（无需手动输入命令！）：
+
+> 🗣️ **English**: "Please install all dependencies for the PDF-Audio-video2Markdown skill"
+> 
+> 🗣️ **中文**: "请帮我安装 PDF-Audio-video2Markdown 这个技能的所有依赖"
+
+The AI will automatically run `setup_environment.py` and configure everything for you!
+
+AI 会自动执行环境配置脚本，为你完成所有依赖安装！
+
+**Step 3: Use It | 开始使用**
+
+Tell your AI what you want to process:
+
+告诉 AI 你想处理什么：
+
+> 🗣️ **English**: "Please transcribe the meeting.mp4 file in my Downloads folder"
+>
+> 🗣️ **中文**: "请把我下载文件夹里的 meeting.mp4 转成文字"
+
+**That's it! No manual commands needed!**
+
+**就这么简单，无需手动输入任何命令！**
 
 ---
 
 ## 🔧 IDE Integration
 
-This skill works with **any AI-powered IDE** that supports the skill format:
+This skill works with **any AI-powered IDE** that supports the skill format.
 
-### Claude Code
+此技能适用于**任何支持 skill 格式的 AI 驱动 IDE**。
 
-```bash
-# Copy to user skills directory
-cp -r PDF-Audio-video2Markdown ~/.claude/skills/
+| IDE | User-level Path | Project-level Path |
+|-----|-----------------|-------------------|
+| Claude Code | `~/.claude/skills/` | `.claude/skills/` |
+| Cursor | `~/.cursor/skills/` | `.cursor/skills/` |
+| Antigravity | `~/.antigravity/skills/` | `.antigravity/skills/` |
+| Windsurf | `~/.windsurf/skills/` | `.windsurf/skills/` |
+| Other IDEs | Check IDE docs | Check IDE docs |
 
-# Or project-level
-cp -r PDF-Audio-video2Markdown .claude/skills/
-```
-
-### Cursor
-
-```bash
-# Copy to user skills directory
-cp -r PDF-Audio-video2Markdown ~/.cursor/skills/
-
-# Or project-level
-cp -r PDF-Audio-video2Markdown .cursor/skills/
-```
-
-### Antigravity
-
-```bash
-cp -r PDF-Audio-video2Markdown ~/.antigravity/skills/
-```
-
-### Windsurf
-
-```bash
-cp -r PDF-Audio-video2Markdown ~/.windsurf/skills/
-```
-
-### Other IDEs
-
-Copy to the IDE's skill directory. The skill follows the standard `SKILL.md` format.
+> **Note**: The skill follows the standard `SKILL.md` format, compatible with most AI-powered IDEs.
+>
+> **注意**：本技能遵循标准 `SKILL.md` 格式，兼容大多数 AI 驱动的 IDE。
 
 ---
 
@@ -303,6 +314,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## 📜 License
 
 MIT License - see [LICENSE](LICENSE)
+
+---
+
+## 👤 Author | 作者
+
+**evan966890**
+
+- Email: evan966890@gmail.com
+- GitHub: [@evan966890](https://github.com/evan966890)
 
 ---
 

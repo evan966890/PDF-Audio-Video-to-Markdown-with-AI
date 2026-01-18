@@ -33,29 +33,35 @@ PDF-Audio-video2Markdown is a **fully portable** multimodal document processing 
 
 ## Quick Start | 快速开始
 
-### Step 1: Setup Environment | 配置环境
+### Step 1: Clone to IDE Skills Folder | 克隆到 IDE 技能目录
 
 ```bash
-cd scripts
-python setup_environment.py
+# Claude Code
+git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.claude/skills/PDF-Audio-video2Markdown
+
+# Cursor
+git clone https://github.com/evan966890/PDF-Audio-video2Markdown.git ~/.cursor/skills/PDF-Audio-video2Markdown
 ```
 
-### Step 2: Place Files | 放置文件
+### Step 2: Ask AI to Setup | 让 AI 帮你配置
 
-Put files in `./input/` directory.
+Just tell your AI assistant in natural language (no manual commands!):
 
-### Step 3: Process | 处理
+只需用自然语言告诉 AI（无需手动命令！）：
 
-```bash
-# Single file 单个文件
-python scripts/process_file.py <file_path> [output_dir]
+> 🗣️ "Please install all dependencies for the PDF-Audio-video2Markdown skill"
+>
+> 🗣️ "请帮我安装 PDF-Audio-video2Markdown 这个技能的所有依赖"
 
-# Batch processing 批量处理
-python scripts/process_all.py [input_dir] [output_dir]
+### Step 3: Use It | 开始使用
 
-# End-to-end test 端到端测试
-python scripts/run_e2e_test.py
-```
+Tell AI what to process:
+
+告诉 AI 要处理什么：
+
+> 🗣️ "Please transcribe meeting.mp4 to text"
+>
+> 🗣️ "请把 meeting.mp4 转成文字"
 
 ## Supported Formats | 支持格式
 
@@ -88,3 +94,7 @@ python scripts/run_e2e_test.py
 | Cursor | `~/.cursor/skills/` or `.cursor/skills/` |
 | Antigravity | `~/.antigravity/skills/` |
 | Windsurf | `~/.windsurf/skills/` |
+
+## Author | 作者
+
+**evan966890** - evan966890@gmail.com
