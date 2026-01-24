@@ -2,14 +2,17 @@
 name: pdf-audio-video-to-markdown-with-ai
 description: >
   Universal AI Skill to convert PDF, audio, video, and images to Markdown text.
-  Features: speaker diarization, YouTube transcription, table extraction, multi-format output.
+  Features: speaker diarization, YouTube transcription, table extraction, multi-format output,
+  **Video OCR for silent videos (PPT recordings, document presentations)**.
   Use this skill when: transcribing meeting recordings, extracting PDF text,
   OCR scanned documents, converting audio/video to text, processing conference recordings,
-  batch document conversion, extracting tables, YouTube subtitles, speaker identification.
+  batch document conversion, extracting tables, YouTube subtitles, speaker identification,
+  **extracting text from PPT recordings, processing silent training videos**.
   触发关键词: 转录, 会议录屏, PDF转文字, 音频转文字, 视频转文字, OCR, 文档处理,
-  说话人分离, YouTube字幕, 表格提取, SRT字幕, 批量处理,
-  transcribe, meeting recording, PDF to text, audio to text, video to text, 
-  document processing, speaker diarization, YouTube transcript, table extraction.
+  说话人分离, YouTube字幕, 表格提取, SRT字幕, 批量处理, **视频OCR, PPT录屏, 无声视频,
+  培训视频, 文档录屏**, transcribe, meeting recording, PDF to text, audio to text, video to text, 
+  document processing, speaker diarization, YouTube transcript, table extraction,
+  **video OCR, PPT recording, silent video, training video**.
   Works with Claude Code, Cursor, Antigravity, Windsurf, and any IDE supporting skill format.
   Let AI handle everything - from environment setup to file transcription!
 ---
@@ -21,6 +24,8 @@ description: >
 Convert PDF / Audio / Video / Images to Markdown text intelligently.
 
 将 PDF / 音频 / 视频 / 图像 智能转换为 Markdown 文本。
+
+**v3.0 新增**: 视频OCR功能（PPT录屏、无声视频文字提取）
 
 ---
 
@@ -101,7 +106,7 @@ Only process files after dependencies are ready.
 
 ## Overview | 概述
 
-**Version**: 2.0.0  
+**Version**: 3.1.0  
 **Python**: 3.10-3.12 (required)  
 **Compatibility**: Claude Code, Cursor, Antigravity, Windsurf, and more
 
@@ -118,6 +123,15 @@ Only process files after dependencies are ready.
 - 📺 **YouTube 转录** - YouTube video transcription
 - 📊 **表格提取** - PDF table extraction
 - 📝 **多格式输出** - SRT/VTT/JSON export
+
+### 🆕 视频OCR功能 / Video OCR Features (v3.0)
+
+- 🎬 **PPT录屏提取** - Extract text from PPT/document recordings
+- 🔄 **智能增量更新** - Smart buffer for progressive reveal (bullet points)
+- 🎯 **双阈值检测** - Dual threshold: scene change (0.70) + incremental (0.85)
+- 🧹 **文本清洗** - Auto-filter page numbers, watermarks, noise
+- ⚡ **混合跳帧** - Hybrid seek: grab() for small jumps, set() for large
+- 🔧 **健壮性增强** - FFmpeg check, timeout protection, error recovery
 
 ---
 
@@ -187,6 +201,37 @@ AI 会自动 / AI will automatically:
 | PDF 表格 | Extract PDF tables / 提取 PDF 中的表格为 Markdown |
 | HTML 输出 | HTML output / 同时生成 HTML 格式 |
 
+### 🆕 图表智能还原 (v3.1 新增)
+
+| 功能 Feature | 说明 Description |
+|--------------|------------------|
+| 图表→表格 | Chart to table / 将折线图、柱状图转为原生数据表格 |
+| 架构图→层级 | Org chart to hierarchy / 将组织架构图转为多级标题+ASCII图+表格 |
+| 流程图→列表 | Flow to list / 将流程图转为结构化列表 |
+| 飞书适配 | Feishu compatible / 输出可直接粘贴到飞书文档 |
+
+**图表还原示例 / Chart Restoration Example:**
+
+```markdown
+# 输入: 销售趋势折线图 / Input: Sales trend chart
+# 输出 / Output:
+| 月份 | GMV (万元) | 环比 |
+|------|-----------|------|
+| 1月 | 7,185 | - |
+| 2月 | 5,894 | -18.0% |
+
+# 输入: 组织架构图 / Input: Org chart  
+# 输出 / Output:
+#### 总部组织
+┌─────────────┐
+│  零售管理部  │
+└──────┬──────┘
+       │
+┌──────┴──────┐
+│   新零售部   │
+└─────────────┘
+```
+
 ### 说话人分离 ~2GB (需要 HuggingFace Token)
 
 | 功能 Feature | 说明 Description |
@@ -195,6 +240,31 @@ AI 会自动 / AI will automatically:
 | 时间标记 | Timestamps / 每段标注说话人和时间 |
 
 > 📖 申请指南 / Guide: `references/huggingface_token_guide.md`
+
+### 🆕 视频OCR ~100MB (v3.0 新增)
+
+| 功能 Feature | 说明 Description |
+|--------------|------------------|
+| PPT录屏 | Extract PPT/slides / 提取PPT录屏中的文字 |
+| 智能增量 | Smart buffer / 解决逐行展示内容丢失 |
+| 双阈值 | Dual threshold / 场景切换与增量更新分离 |
+| 文本清洗 | Text cleaning / 过滤页码、水印、噪声 |
+
+**使用方式 / Usage:**
+
+```bash
+# 命令行 / CLI
+python scripts/video_ocr.py input.mp4 -o output.md
+
+# 带参数 / With options
+python scripts/video_ocr.py input.mp4 \
+    --threshold 0.70 \
+    --method ppt_optimized \
+    --sample-fps 1.0
+```
+
+> 🎬 适用于无声视频，如PPT录屏、文档展示、培训视频
+> Suitable for silent videos like PPT recordings, document presentations, training videos
 
 ---
 
@@ -252,6 +322,7 @@ GPU (可选/Optional): NVIDIA CUDA 支持可加速说话人分离 / CUDA support
 | `youtube_transcript.py` | YouTube 转录 / YouTube transcription |
 | `output_formats.py` | 格式转换 / Format conversion |
 | `advanced_features.py` | 高级功能 / Advanced features |
+| `video_ocr.py` 🆕 | 视频OCR处理 / Video OCR (silent videos) |
 
 ---
 
@@ -276,6 +347,9 @@ GPU (可选/Optional): NVIDIA CUDA 支持可加速说话人分离 / CUDA support
 - "获取 YouTube 视频字幕"
 - "批量处理文件夹中的所有文件"
 - "导出为 SRT 字幕格式"
+- **"提取PPT录屏中的文字"** (v3.0)
+- **"处理这个无声视频"** (v3.0)
+- **"视频OCR提取文档内容"** (v3.0)
 
 ### English Prompts
 - "Transcribe this audio file"
@@ -285,6 +359,9 @@ GPU (可选/Optional): NVIDIA CUDA 支持可加速说话人分离 / CUDA support
 - "Get YouTube video subtitles"
 - "Batch process all files in folder"
 - "Export to SRT subtitle format"
+- **"Extract text from PPT recording"** (v3.0)
+- **"Process this silent video"** (v3.0)
+- **"Video OCR for document presentation"** (v3.0)
 
 ---
 
