@@ -106,9 +106,14 @@ Only process files after dependencies are ready.
 
 ## Overview | 概述
 
-**Version**: 3.1.0  
+**Version**: 3.1.1  
 **Python**: 3.10-3.12 (required)  
 **Compatibility**: Claude Code, Cursor, Antigravity, Windsurf, and more
+
+### Recent Fixes (v3.1.1)
+- Fixed pyannote.audio 3.x compatibility (`use_auth_token` → `token`)
+- Fixed torchcodec issues on Windows (use `soundfile` for audio loading)
+- Updated API calls for pyannote 3.x (`result.speaker_diarization`)
 
 ### 核心功能 / Core Features
 

@@ -59,14 +59,16 @@ def run_speaker_diarization(audio_path: str, num_speakers: Optional[int] = None)
     
     from pyannote.audio import Pipeline
     import torch
+    import soundfile as sf  # Use soundfile to avoid torchcodec issues
     
     token = os.environ.get('HUGGINGFACE_TOKEN') or os.environ.get('HF_TOKEN')
     
     print("Loading speaker diarization model...")
     
+    # pyannote 3.x uses 'token' instead of 'use_auth_token'
     pipeline = Pipeline.from_pretrained(
         "pyannote/speaker-diarization-3.1",
-        use_auth_token=token
+        token=token
     )
     
     if torch.cuda.is_available():
@@ -75,10 +77,30 @@ def run_speaker_diarization(audio_path: str, num_speakers: Optional[int] = None)
     
     print(f"Analyzing audio: {audio_path}")
     
-    if num_speakers:
-        diarization = pipeline(audio_path, num_speakers=num_speakers)
-    else:
-        diarization = pipeline(audio_path)
+    # Load audio using soundfile to avoid torchcodec compatibility issues
+    try:
+        data, sample_rate = sf.read(audio_path)
+        waveform = torch.from_numpy(data).float()
+        if len(waveform.shape) == 1:
+            waveform = waveform.unsqueeze(0)
+        else:
+            waveform = waveform.T
+        audio_in_memory = {"waveform": waveform, "sample_rate": sample_rate}
+        
+        if num_speakers:
+            result = pipeline(audio_in_memory, num_speakers=num_speakers)
+        else:
+            result = pipeline(audio_in_memory)
+    except Exception as e:
+        print(f"[WARN] Memory loading failed, trying file path: {e}")
+        # Fallback to file path
+        if num_speakers:
+            result = pipeline(audio_path, num_speakers=num_speakers)
+        else:
+            result = pipeline(audio_path)
+    
+    # pyannote 3.x: access Annotation via speaker_diarization attribute
+    diarization = result.speaker_diarization if hasattr(result, 'speaker_diarization') else result
     
     segments = []
     for turn, _, speaker in diarization.itertracks(yield_label=True):

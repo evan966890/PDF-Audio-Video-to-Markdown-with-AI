@@ -94,6 +94,38 @@ cannot open document
 
 ## Audio/Video Processing Issues / 音频/视频处理问题
 
+### pyannote.audio 3.x Compatibility / pyannote.audio 3.x 兼容性
+
+**Error / 错误信息:**
+```
+TypeError: Pipeline.from_pretrained() got an unexpected keyword argument 'use_auth_token'
+```
+
+**Solution / 解决方案:**
+This is an API change in pyannote 3.x. The code has been updated to use `token` instead of `use_auth_token`.
+
+这是 pyannote 3.x 的 API 变更。代码已更新为使用 `token` 替代 `use_auth_token`。
+
+---
+
+### AudioDecoder / torchcodec Error / AudioDecoder / torchcodec 错误
+
+**Error / 错误信息:**
+```
+NameError: name 'AudioDecoder' is not defined
+```
+
+**Solution / 解决方案:**
+This is a torchcodec compatibility issue on Windows. The code now uses `soundfile` for audio loading instead.
+
+这是 Windows 上的 torchcodec 兼容性问题。代码现在使用 `soundfile` 加载音频。
+
+```bash
+pip install soundfile
+```
+
+---
+
 ### Out of Memory / 内存不足
 
 **Error / 错误信息:**
